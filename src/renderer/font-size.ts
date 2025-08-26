@@ -18,11 +18,11 @@ $div.append($span);
 
 export const $fixFontSize = useTextMetrics ? null : $div;
 
-export function getRealFontSize(fn, fs) {
+export function getRealFontSize(fn: number, fs: number) {
   if (!lineSpacing[fn]) {
     if (useTextMetrics) {
-      ctx.font = `${unitsPerEm}px "${fn}"`;
-      const tm = ctx.measureText('');
+      ctx!.font = `${unitsPerEm}px "${fn}"`;
+      const tm = ctx!.measureText('');
       lineSpacing[fn] = tm.fontBoundingBoxAscent + tm.fontBoundingBoxDescent;
     } else {
       $span.style.fontFamily = `"${fn}"`;

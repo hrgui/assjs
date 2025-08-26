@@ -1,4 +1,6 @@
-export function createStyle(dialogue) {
+import { ASSDialogue } from '../types/ASSDialogue';
+
+export function createStyle(dialogue: ASSDialogue) {
   const { layer, align, effect, pos, margin, q } = dialogue;
   let cssText = '';
   if (layer) cssText += `z-index:${layer};`;

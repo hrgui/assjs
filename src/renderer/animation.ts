@@ -3,6 +3,8 @@ import { getRealFontSize } from './font-size.js';
 // eslint-disable-next-line import/no-cycle
 import { createRectClip } from './clip.js';
 import { rotateTags, skewTags, scaleTags } from './transform.js';
+import { ASSDialogue } from '../types/ASSDialogue.js';
+import { ASSStore } from '../types/ASSStore.js';
 
 const strokeTags = ['blur', 'xbord', 'ybord', 'xshad', 'yshad'];
 if (window.CSS.registerProperty) {
@@ -17,7 +19,7 @@ if (window.CSS.registerProperty) {
       name: `--ass-${k}`,
       syntax: '<number>',
       inherits: true,
-      initialValue: 0,
+      initialValue: String(0),
     });
   });
   ['border-opacity', 'shadow-opacity', ...scaleTags.map((tag) => `tag-${tag}`)].forEach((k) => {
@@ -25,7 +27,7 @@ if (window.CSS.registerProperty) {
       name: `--ass-${k}`,
       syntax: '<number>',
       inherits: true,
-      initialValue: 1,
+      initialValue: String(1),
     });
   });
   ['fill-color', 'border-color', 'shadow-color'].forEach((k) => {
@@ -38,7 +40,7 @@ if (window.CSS.registerProperty) {
   });
 }
 
-export function createEffect(effect, duration) {
+export function createEffect(effect: any, duration: number) {
   // TODO: when effect and move both exist, its behavior is weird, for now only move works.
   const { name, delay, leftToRight } = effect;
   const translate = name === 'banner' ? 'X' : 'Y';
@@ -59,11 +61,11 @@ export function createEffect(effect, duration) {
   return [keyframes, { duration, fill: 'forwards' }];
 }
 
-function multiplyScale(v) {
+function multiplyScale(v: number) {
   return `calc(var(--ass-scale) * ${v}px)`;
 }
 
-export function createMove(move, duration) {
+export function createMove(move: any, duration: number) {
   const { x1, y1, x2, y2, t1, t2 } = move;
   const start = `translate(${multiplyScale(x1)}, ${multiplyScale(y1)})`;
   const end = `translate(${multiplyScale(x2)}, ${multiplyScale(y2)})`;
@@ -78,7 +80,7 @@ export function createMove(move, duration) {
   return [keyframes, options];
 }
 
-export function createFadeList(fade, duration) {
+export function createFadeList(fade: any, duration: number) {
   const { type, a1, a2, a3, t1, t2, t3, t4 } = fade;
   // \fad(<t1>, <t2>)
   if (type === 'fad') {
@@ -110,7 +112,7 @@ export function createFadeList(fade, duration) {
   return [[keyframes, { duration: fadeDuration, fill: 'forwards' }]];
 }
 
-export function createAnimatableVars(tag) {
+export function createAnimatableVars(tag: any) {
   return [
     ['real-fs', getRealFontSize(tag.fn, tag.fs)],
     ['tag-fs', tag.fs],
@@ -122,7 +124,7 @@ export function createAnimatableVars(tag) {
 }
 
 // use linear() to simulate accel
-function getEasing(duration, accel) {
+function getEasing(duration: number, accel: number) {
   if (accel === 1) return 'linear';
   // 60fps
   const frames = Math.ceil((duration / 1000) * 60);
@@ -130,7 +132,7 @@ function getEasing(duration, accel) {
   return `linear(${points.join(',')})`;
 }
 
-export function createDialogueAnimations(el, dialogue) {
+export function createDialogueAnimations(el: any, dialogue: ASSDialogue) {
   const { start, end, effect, move, fade } = dialogue;
   const duration = (end - start) * 1000;
   return [
@@ -139,10 +141,10 @@ export function createDialogueAnimations(el, dialogue) {
     ...(fade ? createFadeList(fade, duration) : []),
   ]
     .filter(Boolean)
-    .map(([keyframes, options]) => initAnimation(el, keyframes, options));
+    .map(([keyframes, options]: any) => initAnimation(el, keyframes, options));
 }
 
-function createTagKeyframes(fromTag, tag, key) {
+function createTagKeyframes(fromTag: any, tag: any, key: any) {
   const value = tag[key];
   if (value === undefined) return [];
   if (key === 'clip') return [];
@@ -170,9 +172,9 @@ function createTagKeyframes(fromTag, tag, key) {
   return [[`tag-${key}`, value]];
 }
 
-export function createTagAnimations(el, fragment, sliceTag) {
+export function createTagAnimations(el: any, fragment: any, sliceTag: any) {
   const fromTag = { ...sliceTag, ...fragment.tag };
-  return (fragment.tag.t || []).map(({ t1, t2, accel, tag }) => {
+  return (fragment.tag.t || []).map(({ t1, t2, accel, tag }: any) => {
     const keyframe = Object.fromEntries(
       Object.keys(tag)
         .flatMap((key) => createTagKeyframes(fromTag, tag, key))
@@ -190,15 +192,15 @@ export function createTagAnimations(el, fragment, sliceTag) {
   });
 }
 
-export function createClipAnimations(el, dialogue, store) {
+export function createClipAnimations(el: any, dialogue: any, store: ASSStore) {
   return dialogue.slices
-    .flatMap((slice) => slice.fragments)
-    .flatMap((fragment) => fragment.tag.t || [])
-    .filter(({ tag }) => tag.clip)
-    .map(({ t1, t2, accel, tag }) => {
+    .flatMap((slice: any) => slice.fragments)
+    .flatMap((fragment: any) => fragment.tag.t || [])
+    .filter(({ tag }: any) => tag.clip)
+    .map(({ t1, t2, accel, tag }: any) => {
       const keyframe = {
         offset: 1,
-        clipPath: createRectClip(tag.clip, store.scriptRes.width, store.scriptRes.height),
+        clipPath: createRectClip(tag.clip, store.scriptRes.width!, store.scriptRes.height!),
       };
       const duration = Math.max(0, t2 - t1);
       return initAnimation(el, [keyframe], {

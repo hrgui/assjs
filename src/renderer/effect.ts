@@ -1,10 +1,13 @@
-export function setEffect(dialogue, store) {
+import { ASSDialogue } from '../types/ASSDialogue';
+import { ASSStore } from '../types/ASSStore';
+
+export function setEffect(dialogue: ASSDialogue, store: ASSStore) {
   const $area = document.createElement('div');
   $area.className = 'ASS-effect-area';
   store.box.insertBefore($area, dialogue.$div);
   $area.append(dialogue.$div);
   const { width, height } = store.scriptRes;
-  const { name, y1, y2, leftToRight, fadeAwayWidth, fadeAwayHeight } = dialogue.effect;
+  const { name, y1, y2, leftToRight, fadeAwayWidth, fadeAwayHeight } = dialogue.effect as any;
   const min = Math.min(y1, y2);
   const max = Math.max(y1, y2);
   $area.dataset.effect = name;
@@ -13,8 +16,8 @@ export function setEffect(dialogue, store) {
     $area.style.justifyContent = ['flex-end', 'center', 'flex-start'][dialogue.align.v];
   }
   if (name.startsWith('scroll')) {
-    const top = (min / height) * 100;
-    const bottom = ((height - max) / height) * 100;
+    const top = (min / height!) * 100;
+    const bottom = ((height! - max) / height!) * 100;
     $area.style.cssText = `top:${top}%;bottom:${bottom}%;`;
     $area.style.justifyContent = ['flex-start', 'center', 'flex-end'][dialogue.align.h];
   }
@@ -26,7 +29,7 @@ export function setEffect(dialogue, store) {
     ].join(',');
   }
   if (fadeAwayWidth) {
-    const p = (fadeAwayWidth / width) * 100;
+    const p = (fadeAwayWidth / width!) * 100;
     // only left side has fade away effect in VSFilter
     $area.style.maskImage = `linear-gradient(90deg, transparent, #000 ${p}%)`;
   }

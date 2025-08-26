@@ -7,19 +7,23 @@ import {
 import { createStrokeVars, createStrokeFilter } from './stroke.js';
 import { rotateTags, scaleTags, skewTags, createTransform } from './transform.js';
 import { createSVGEl } from '../utils.js';
+import { ASSStore } from '../types/ASSStore.js';
+import { ASSDialogue } from '../types/ASSDialogue.js';
+import { ASSTag } from '../types/ASSTag.js';
+import { CompiledTag } from 'ass-compiler/types/tags.js';
 
-function encodeText(text, q) {
+function encodeText(text: string, q: number) {
   return text
     .replace(/\\h/g, ' ')
     .replace(/\\N/g, '\n')
     .replace(/\\n/g, q === 2 ? '\n' : ' ');
 }
 
-export function createDialogue(dialogue, store) {
+export function createDialogue(dialogue: ASSDialogue, store: ASSStore) {
   const { styles } = store;
   const $div = document.createElement('div');
   $div.className = 'ASS-dialogue';
-  $div.dataset.wrapStyle = dialogue.q;
+  $div.dataset.wrapStyle = String(dialogue.q);
   const df = document.createDocumentFragment();
   const { align, slices } = dialogue;
   [
@@ -36,16 +40,16 @@ export function createDialogue(dialogue, store) {
       const { text, drawing } = fragment;
       const tag = { ...sliceTag, ...fragment.tag };
       let cssText = '';
-      const cssVars = [];
+      const cssVars: any[] = [];
 
       cssVars.push(...createStrokeVars(tag));
       let stroke = null;
       const hasStroke = tag.xbord || tag.ybord || tag.xshad || tag.yshad;
       if (hasStroke && (drawing || tag.a1 !== '00' || tag.xbord !== tag.ybord)) {
-        const filter = createStrokeFilter(tag, store.sbas ? store.scale : 1);
+        const filter = createStrokeFilter(tag as Required<ASSTag>, store.sbas ? store.scale : 1);
         const svg = createSVGEl('svg', [
-          ['width', 0],
-          ['height', 0],
+          ['width', String(0)],
+          ['height', String(0)],
         ]);
         svg.append(filter.el);
         stroke = { id: filter.id, el: svg };
@@ -68,9 +72,13 @@ export function createDialogue(dialogue, store) {
 
       cssVars.push(...createTransform(tag));
       const tags = [tag, ...(tag.t || []).map((t) => t.tag)];
-      const hasRotate = rotateTags.some((x) => tags.some((t) => t[x]));
-      const hasScale = scaleTags.some((x) => tags.some((t) => t[x] !== undefined && t[x] !== 100));
-      const hasSkew = skewTags.some((x) => tags.some((t) => t[x]));
+      const hasRotate = rotateTags.some((x) => tags.some((t) => t[x as keyof CompiledTag]));
+      const hasScale = scaleTags.some((x) =>
+        tags.some(
+          (t) => t[x as keyof CompiledTag] !== undefined && t[x as keyof CompiledTag] !== 100,
+        ),
+      );
+      const hasSkew = skewTags.some((x) => tags.some((t) => t[x as keyof CompiledTag]));
 
       encodeText(text, dialogue.q)
         .split('\n')
@@ -99,7 +107,7 @@ export function createDialogue(dialogue, store) {
             if (idx) {
               const br = document.createElement('div');
               br.dataset.is = 'br';
-              br.style.setProperty('--ass-tag-fs', tag.fs);
+              br.style.setProperty('--ass-tag-fs', String(tag.fs));
               df.append(br);
             }
             if (!content) return;
@@ -111,7 +119,7 @@ export function createDialogue(dialogue, store) {
             const el = hasScale || hasSkew ? $ssspan : $span;
             el.dataset.text = content;
             if (hasStroke) {
-              el.dataset.borderStyle = borderStyle;
+              el.dataset.borderStyle = String(borderStyle);
               el.dataset.stroke = 'css';
             }
             if (stroke) {

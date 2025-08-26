@@ -3,6 +3,7 @@ import { compile } from 'ass-compiler';
 import { $fixFontSize } from './renderer/font-size.js';
 import { clear, createResize, createPlay, createPause, createSeek } from './internal.js';
 import { addGlobalStyle } from './utils.js';
+import { ASSStore } from './types/ASSStore.js';
 
 /**
  * @typedef {Object} ASSOption
@@ -20,7 +21,7 @@ import { addGlobalStyle } from './utils.js';
  */
 
 export default class ASS {
-  #store = {
+  #store: ASSStore = {
     /** @type {HTMLVideoElement} */
     video: null,
     /** the box to display subtitles */
@@ -52,7 +53,6 @@ export default class ASS {
      * @type {import('ass-compiler').Dialogue[]}
      */
     actives: [],
-    /** record dialogues' position */
     space: [],
     requestId: 0,
     currentTime: 0,
@@ -97,21 +97,33 @@ export default class ASS {
    * });
    * ```
    */
-  constructor({ content, container, video, resampling }) {
+  constructor({
+    content,
+    container,
+    video,
+    resampling,
+  }: {
+    content: string;
+    container: HTMLElement;
+    video?: HTMLVideoElement;
+    resampling?: string;
+  }) {
     if (!container) {
       throw new Error('Missing container.');
     }
     this.#store.video = video || null;
 
-    const { info, width, height, styles, dialogues } = compile(content);
+    const { info, width, height, styles, dialogues } = compile(content, {});
     this.#store.sbas = /yes/i.test(info.ScaledBorderAndShadow);
     // Use container dimensions as fallback if no video is provided
     const fallbackWidth = container.clientWidth || 640;
     const fallbackHeight = container.clientHeight || 360;
     this.#store.layoutRes = {
-      width: info.LayoutResX * 1 || (video ? video.videoWidth || video.clientWidth : fallbackWidth),
+      width:
+        Number(info.LayoutResX) || (video ? video.videoWidth || video.clientWidth : fallbackWidth),
       height:
-        info.LayoutResY * 1 || (video ? video.videoHeight || video.clientHeight : fallbackHeight),
+        Number(info.LayoutResY) ||
+        (video ? video.videoHeight || video.clientHeight : fallbackHeight),
     };
     this.#store.scriptRes = {
       width: width || this.#store.layoutRes.width,
@@ -120,7 +132,7 @@ export default class ASS {
     this.#store.styles = styles;
     this.#store.dialogues = dialogues.map((dia) =>
       Object.assign(dia, {
-        effect: ['banner', 'scroll up', 'scroll down'].includes(dia.effect?.name)
+        effect: ['banner', 'scroll up', 'scroll down'].includes(dia.effect?.name ?? '')
           ? dia.effect
           : null,
         align: {
@@ -156,7 +168,7 @@ export default class ASS {
 
     this.#resize = createResize(this, this.#store);
     this.#resize();
-    this.resampling = resampling;
+    this.resampling = resampling || 'video_height';
 
     // Observe video if present, otherwise observe container for resize
     const observer = new ResizeObserver(this.#resize);
@@ -166,7 +178,7 @@ export default class ASS {
     return this;
   }
 
-  setCurrentTime(t) {
+  setCurrentTime(t: number): void {
     this.#store.currentTime = t;
     this.#seek();
   }
@@ -175,7 +187,7 @@ export default class ASS {
    * Desctroy the ASS instance
    * @returns {ASS}
    */
-  destroy() {
+  destroy(): this {
     const { video, box, observer } = this.#store;
     this.#pause();
     clear(this.#store);
@@ -191,7 +203,10 @@ export default class ASS {
       $fixFontSize.remove();
     }
     box.remove();
-    observer.unobserve(video || box.parentNode);
+    const el = video || box.parentNode;
+    if (el) {
+      observer?.unobserve(el as Element);
+    }
 
     this.#store.styles = {};
     this.#store.dialogues = [];
@@ -203,7 +218,7 @@ export default class ASS {
    * Show subtitles in the container
    * @returns {ASS}
    */
-  show() {
+  show(): this {
     this.#store.box.style.visibility = 'visible';
     return this;
   }
@@ -212,7 +227,7 @@ export default class ASS {
    * Hide subtitles in the container
    * @returns {ASS}
    */
-  hide() {
+  hide(): this {
     this.#store.box.style.visibility = 'hidden';
     return this;
   }
@@ -220,11 +235,11 @@ export default class ASS {
   #resampling = 'video_height';
 
   /** @type {ASSOption['resampling']} */
-  get resampling() {
+  get resampling(): string {
     return this.#resampling;
   }
 
-  set resampling(r) {
+  set resampling(r: string) {
     if (r === this.#resampling) return;
     if (/^(video|script)_(width|height)$/.test(r)) {
       this.#resampling = r;
@@ -233,11 +248,11 @@ export default class ASS {
   }
 
   /** @type {number} Subtitle delay in seconds. */
-  get delay() {
+  get delay(): number {
     return this.#store.delay;
   }
 
-  set delay(d) {
+  set delay(d: number) {
     if (typeof d !== 'number') return;
     this.#store.delay = d;
     this.#seek();

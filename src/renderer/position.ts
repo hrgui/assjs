@@ -1,4 +1,7 @@
-function allocate(dialogue, store) {
+import { ASSDialogue } from '../types/ASSDialogue';
+import { ASSStore } from '../types/ASSStore';
+
+function allocate(dialogue: ASSDialogue, store: ASSStore) {
   const { space, scale } = store;
   const { layer, margin, width, height, alignment, end } = dialogue;
   const stageWidth = store.width - Math.trunc(scale * (margin.left + margin.right));
@@ -12,7 +15,7 @@ function allocate(dialogue, store) {
   };
   const channel = space[layer];
   const alignH = ['right', 'left', 'center'][alignment % 3];
-  const willCollide = (y) => {
+  const willCollide = (y: number) => {
     const lw = channel.left.width[y];
     const cw = channel.center.width[y];
     const rw = channel.right.width[y];
@@ -36,7 +39,7 @@ function allocate(dialogue, store) {
   };
   let count = 0;
   let result = 0;
-  const find = (y) => {
+  const find = (y: number) => {
     count = willCollide(y) ? 0 : count + 1;
     if (count >= height) {
       result = y;
@@ -70,7 +73,7 @@ function allocate(dialogue, store) {
   return result;
 }
 
-export function getPosition(dialogue, store) {
+export function getPosition(dialogue: ASSDialogue, store: ASSStore) {
   const { scale } = store;
   const { move, align, width, height, margin, slices } = dialogue;
   let x = 0;
@@ -83,7 +86,9 @@ export function getPosition(dialogue, store) {
     y = [sy - height, sy - height / 2, sy][align.v];
   } else {
     x = [0, (store.width - width) / 2, store.width - width - scale * margin.right][align.h];
-    const hasT = slices.some((slice) => slice.fragments.some(({ keyframes }) => keyframes?.length));
+    const hasT = slices.some((slice) =>
+      (slice.fragments as any).some(({ keyframes }: any) => keyframes?.length),
+    );
     y = hasT
       ? [store.height - height - margin.vertical, (store.height - height) / 2, margin.vertical][
           align.v

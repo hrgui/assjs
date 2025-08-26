@@ -1,6 +1,7 @@
+import { ASSTag } from '../types/ASSTag.js';
 import { color2rgba, createSVGEl, uuid } from '../utils.js';
 
-export function createStrokeFilter(tag, scale) {
+export function createStrokeFilter(tag: Required<ASSTag>, scale: number) {
   const id = `ASS-${uuid()}`;
   const hasBorder = tag.xbord || tag.ybord;
   const hasShadow = tag.xshad || tag.yshad;
@@ -9,7 +10,7 @@ export function createStrokeFilter(tag, scale) {
   const $filter = createSVGEl('filter', [['id', id]]);
   $filter.append(
     createSVGEl('feGaussianBlur', [
-      ['stdDeviation', hasBorder ? 0 : blur],
+      ['stdDeviation', String(hasBorder ? 0 : blur)],
       ['in', 'SourceGraphic'],
       ['result', 'sg_b'],
     ]),
@@ -39,7 +40,7 @@ export function createStrokeFilter(tag, scale) {
     );
     $filter.append(
       createSVGEl('feGaussianBlur', [
-        ['stdDeviation', blur],
+        ['stdDeviation', String(blur)],
         ['in', 'dil'],
         ['result', 'dil_b'],
       ]),
@@ -70,15 +71,15 @@ export function createStrokeFilter(tag, scale) {
   if (hasShadow && (hasBorder || isOpaque)) {
     $filter.append(
       createSVGEl('feOffset', [
-        ['dx', tag.xshad * scale],
-        ['dy', tag.yshad * scale],
+        ['dx', String(tag.xshad * scale)],
+        ['dy', String(tag.yshad * scale)],
         ['in', hasBorder ? (isOpaque ? 'dil' : 'dil_b_o') : 'SourceGraphic'],
         ['result', 'off'],
       ]),
     );
     $filter.append(
       createSVGEl('feGaussianBlur', [
-        ['stdDeviation', blur],
+        ['stdDeviation', String(blur)],
         ['in', 'off'],
         ['result', 'off_b'],
       ]),
@@ -86,8 +87,8 @@ export function createStrokeFilter(tag, scale) {
     if (!isOpaque) {
       $filter.append(
         createSVGEl('feOffset', [
-          ['dx', tag.xshad * scale],
-          ['dy', tag.yshad * scale],
+          ['dx', String(tag.xshad * scale)],
+          ['dy', String(tag.yshad * scale)],
           ['in', 'SourceGraphic'],
           ['result', 'sg_off'],
         ]),
@@ -128,7 +129,7 @@ export function createStrokeFilter(tag, scale) {
   return { id, el: $filter };
 }
 
-export function createStrokeVars(tag) {
+export function createStrokeVars(tag: any) {
   return [
     ['border-width', tag.xbord * 2],
     ['border-color', color2rgba(`${tag.a3}${tag.c3}`)],

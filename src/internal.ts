@@ -2,7 +2,7 @@
 import { renderer } from './renderer/renderer.js';
 import { batchAnimate } from './utils.js';
 
-export function clear(store) {
+export function clear(store: any): void {
   const { box } = store;
   while (box.lastChild) {
     box.lastChild.remove();
@@ -11,7 +11,7 @@ export function clear(store) {
   store.space = [];
 }
 
-function framing(store, mediaTime) {
+function framing(store: any, mediaTime: number): void {
   const { dialogues, actives } = store;
   const vct = mediaTime - store.delay;
   for (let i = actives.length - 1; i >= 0; i -= 1) {
@@ -25,7 +25,7 @@ function framing(store, mediaTime) {
   while (store.index < dialogues.length && vct >= dialogues[store.index].start) {
     if (vct < dialogues[store.index].end) {
       const dia = renderer(dialogues[store.index], store);
-      (dia.animations || []).forEach((animation) => {
+      (dia.animations || []).forEach((animation: any) => {
         animation.currentTime = (vct - dia.start) * 1000;
       });
       actives.push(dia);
@@ -37,8 +37,8 @@ function framing(store, mediaTime) {
   }
 }
 
-export function createSeek(store) {
-  return function seek() {
+export function createSeek(store: any): () => void {
+  return function seek(): void {
     clear(store);
     const { video, dialogues } = store;
 
@@ -59,7 +59,7 @@ export function createSeek(store) {
   };
 }
 
-function createFrame(video) {
+function createFrame(video: any): [Function, Function] {
   const useVFC = video && video.requestVideoFrameCallback;
   return [
     useVFC ? video.requestVideoFrameCallback.bind(video) : requestAnimationFrame,
@@ -67,11 +67,11 @@ function createFrame(video) {
   ];
 }
 
-export function createPlay(store) {
+export function createPlay(store: any): () => void {
   const { video } = store;
   const [requestFrame, cancelFrame] = createFrame(video);
-  return function play() {
-    const frame = (now, metadata) => {
+  return function play(): void {
+    const frame = (now: any, metadata: any) => {
       if (video) {
         store.currentTime = video.currentTime;
       }
@@ -81,26 +81,26 @@ export function createPlay(store) {
     };
     cancelFrame(store.requestId);
     store.requestId = requestFrame(frame);
-    store.actives.forEach((dia) => {
+    store.actives.forEach((dia: any) => {
       batchAnimate(dia, 'play');
     });
   };
 }
 
-export function createPause(store) {
+export function createPause(store: any): () => void {
   const [, cancelFrame] = createFrame(store.video);
-  return function pause() {
+  return function pause(): void {
     cancelFrame(store.requestId);
     store.requestId = 0;
-    store.actives.forEach((dia) => {
+    store.actives.forEach((dia: any) => {
       batchAnimate(dia, 'pause');
     });
   };
 }
 
-export function createResize(that, store) {
+export function createResize(that: any, store: any): () => void {
   const { video, container, box, layoutRes } = store;
-  return function resize() {
+  return function resize(): void {
     if (!video && !container) {
       return;
     }

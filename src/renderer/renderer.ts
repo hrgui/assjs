@@ -4,8 +4,10 @@ import { getPosition } from './position.js';
 import { createStyle } from './style.js';
 import { setTransformOrigin } from './transform.js';
 import { setEffect } from './effect.js';
+import { ASSStore } from '../types/ASSStore.js';
+import { ASSDialogue } from '../types/ASSDialogue.js';
 
-export function renderer(dialogue, store) {
+export function renderer(dialogue: ASSDialogue, store: ASSStore) {
   const { $div, animations } = createDialogue(dialogue, store);
   Object.assign(dialogue, { $div, animations });
   store.box.append($div);
