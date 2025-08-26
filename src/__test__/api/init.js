@@ -6,9 +6,13 @@ describe('init API', () => {
     // eslint-disable-next-line no-unused-vars
     let ass = null;
 
-    expect(() => { ass = new ASS(); }).to.throw();
+    expect(() => {
+      ass = new ASS();
+    }).to.throw();
 
-    expect(() => { ass = new ASS('', document.createElement('video')); }).to.throw();
+    expect(() => {
+      ass = new ASS('', document.createElement('video'));
+    }).to.throw();
   });
 
   it('should support option.container', ({ $video }) => {
@@ -30,7 +34,7 @@ describe('init API', () => {
 
   it('should work in Shadow DOM', () => {
     const $shadow = document.createElement('div');
-    if (!($shadow.getRootNode) || !($shadow.attachShadow)) {
+    if (!$shadow.getRootNode || !$shadow.attachShadow) {
       this.skip();
       return;
     }
