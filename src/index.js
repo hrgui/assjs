@@ -68,20 +68,18 @@ export default class ASS {
 
   /**
    * Initialize an ASS instance
-   * @param {string} content ASS content
-   * @param {HTMLVideoElement} video The video element to be associated with
-   * @param {ASSOption} [option]
+   * @param {Object} params
+   * @param {string} params.content ASS content
+   * @param {HTMLElement} params.container The container to display subtitles. Must be provided.
+   * @param {HTMLVideoElement} [params.video] Optional video element to sync with.
+   * @param {ASSOption['resampling']} [params.resampling]
    * @returns {ASS}
    * @example
    *
    * HTML:
    * ```html
    * <div id="container" style="position: relative;">
-   *   <video
-   *     id="video"
-   *     src="./example.mp4"
-   *     style="position: absolute; width: 100%; height: 100%;"
-   *   ></video>
+   *   <!-- Optionally, a <video> can be inside, but is not required -->
    *   <!-- ASS will be added here -->
    * </div>
    * ```
@@ -91,35 +89,47 @@ export default class ASS {
    * import ASS from 'assjs';
    *
    * const content = await fetch('/path/to/example.ass').then((res) => res.text());
-   * const ass = new ASS(content, document.querySelector('#video'), {
+   * const ass = new ASS({
+   *   content,
    *   container: document.querySelector('#container'),
+   *   // video: document.querySelector('#video'), // optional
    * });
    * ```
    */
-  constructor(content, video, { container = video.parentNode, resampling } = {}) {
-    this.#store.video = video;
-    if (!container) throw new Error('Missing container.');
+  constructor({ content, container, video, resampling }) {
+    if (!container) {
+      throw new Error('Missing container.');
+    }
+    this.#store.video = video || null;
 
     const { info, width, height, styles, dialogues } = compile(content);
     this.#store.sbas = /yes/i.test(info.ScaledBorderAndShadow);
+    // Use container dimensions as fallback if no video is provided
+    const fallbackWidth = container.clientWidth || 640;
+    const fallbackHeight = container.clientHeight || 360;
     this.#store.layoutRes = {
-      width: info.LayoutResX * 1 || video.videoWidth || video.clientWidth,
-      height: info.LayoutResY * 1 || video.videoHeight || video.clientHeight,
+      width: info.LayoutResX * 1 || (video ? video.videoWidth || video.clientWidth : fallbackWidth),
+      height:
+        info.LayoutResY * 1 || (video ? video.videoHeight || video.clientHeight : fallbackHeight),
     };
     this.#store.scriptRes = {
       width: width || this.#store.layoutRes.width,
       height: height || this.#store.layoutRes.height,
     };
     this.#store.styles = styles;
-    this.#store.dialogues = dialogues.map((dia) => Object.assign(dia, {
-      effect: ['banner', 'scroll up', 'scroll down'].includes(dia.effect?.name) ? dia.effect : null,
-      align: {
-        // 0: left, 1: center, 2: right
-        h: (dia.alignment + 2) % 3,
-        // 0: bottom, 1: center, 2: top
-        v: Math.trunc((dia.alignment - 1) / 3),
-      },
-    }));
+    this.#store.dialogues = dialogues.map((dia) =>
+      Object.assign(dia, {
+        effect: ['banner', 'scroll up', 'scroll down'].includes(dia.effect?.name)
+          ? dia.effect
+          : null,
+        align: {
+          // 0: left, 1: center, 2: right
+          h: (dia.alignment + 2) % 3,
+          // 0: bottom, 1: center, 2: top
+          v: Math.trunc((dia.alignment - 1) / 3),
+        },
+      }),
+    );
 
     if ($fixFontSize) {
       container.append($fixFontSize);
@@ -134,18 +144,22 @@ export default class ASS {
     this.#play = createPlay(this.#store);
     this.#pause = createPause(this.#store);
     this.#seek = createSeek(this.#store);
-    video.addEventListener('play', this.#play);
-    video.addEventListener('pause', this.#pause);
-    video.addEventListener('playing', this.#play);
-    video.addEventListener('waiting', this.#pause);
-    video.addEventListener('seeking', this.#seek);
+
+    if (video) {
+      video.addEventListener('play', this.#play);
+      video.addEventListener('pause', this.#pause);
+      video.addEventListener('playing', this.#play);
+      video.addEventListener('waiting', this.#pause);
+      video.addEventListener('seeking', this.#seek);
+    }
 
     this.#resize = createResize(this, this.#store);
     this.#resize();
     this.resampling = resampling;
 
+    // Observe video if present, otherwise observe container for resize
     const observer = new ResizeObserver(this.#resize);
-    observer.observe(video);
+    observer.observe(video || container);
     this.#store.observer = observer;
 
     return this;
@@ -159,17 +173,19 @@ export default class ASS {
     const { video, box, observer } = this.#store;
     this.#pause();
     clear(this.#store);
-    video.removeEventListener('play', this.#play);
-    video.removeEventListener('pause', this.#pause);
-    video.removeEventListener('playing', this.#play);
-    video.removeEventListener('waiting', this.#pause);
-    video.removeEventListener('seeking', this.#seek);
+    if (video) {
+      video.removeEventListener('play', this.#play);
+      video.removeEventListener('pause', this.#pause);
+      video.removeEventListener('playing', this.#play);
+      video.removeEventListener('waiting', this.#pause);
+      video.removeEventListener('seeking', this.#seek);
+    }
 
     if ($fixFontSize) {
       $fixFontSize.remove();
     }
     box.remove();
-    observer.unobserve(this.#store.video);
+    observer.unobserve(video || box.parentNode);
 
     this.#store.styles = {};
     this.#store.dialogues = [];
@@ -220,7 +236,4 @@ export default class ASS {
     this.#store.delay = d;
     this.#seek();
   }
-
-  // addDialogue(dialogue) {
-  // }
 }
