@@ -49,6 +49,7 @@
     "eslint-plugin-unicorn": "^56.0.1",
     "lightningcss": "^1.29.1",
     "playwright": "^1.50.1",
+    "prettier": "^3.6.2",
     "rollup": "^4.34.0",
     "typescript": "^5.7.3",
     "vitest": "^3.0.4"
