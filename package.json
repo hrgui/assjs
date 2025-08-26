@@ -11,6 +11,7 @@
   ],
   "scripts": {
     "dev": "rollup -c -w",
+    "prettier": "prettier --write src/.",
     "lint": "eslint src test",
     "unit": "vitest run",
     "test": "npm run lint && npm run unit",

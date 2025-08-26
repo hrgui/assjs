@@ -7,7 +7,10 @@ import { rotateTags, skewTags, scaleTags } from './transform.js';
 const strokeTags = ['blur', 'xbord', 'ybord', 'xshad', 'yshad'];
 if (window.CSS.registerProperty) {
   [
-    'real-fs', 'tag-fs', 'tag-fsp', 'border-width',
+    'real-fs',
+    'tag-fs',
+    'tag-fsp',
+    'border-width',
     ...[...strokeTags, ...rotateTags, ...skewTags].map((tag) => `tag-${tag}`),
   ].forEach((k) => {
     window.CSS.registerProperty({
@@ -17,10 +20,7 @@ if (window.CSS.registerProperty) {
       initialValue: 0,
     });
   });
-  [
-    'border-opacity', 'shadow-opacity',
-    ...scaleTags.map((tag) => `tag-${tag}`),
-  ].forEach((k) => {
+  ['border-opacity', 'shadow-opacity', ...scaleTags.map((tag) => `tag-${tag}`)].forEach((k) => {
     window.CSS.registerProperty({
       name: `--ass-${k}`,
       syntax: '<number>',
@@ -42,16 +42,19 @@ export function createEffect(effect, duration) {
   // TODO: when effect and move both exist, its behavior is weird, for now only move works.
   const { name, delay, leftToRight } = effect;
   const translate = name === 'banner' ? 'X' : 'Y';
-  const dir = ({
+  const dir = {
     X: leftToRight ? 1 : -1,
     Y: /up/.test(name) ? -1 : 1,
-  })[translate];
+  }[translate];
   const start = -100 * dir;
   // speed is 1000px/s when delay=1
   const distance = (duration / (delay || 1)) * dir;
   const keyframes = [
     { offset: 0, transform: `translate${translate}(${start}%)` },
-    { offset: 1, transform: `translate${translate}(calc(${start}% + var(--ass-scale) * ${distance}px))` },
+    {
+      offset: 1,
+      transform: `translate${translate}(calc(${start}% + var(--ass-scale) * ${distance}px))`,
+    },
   ];
   return [keyframes, { duration, fill: 'forwards' }];
 }
@@ -68,7 +71,7 @@ export function createMove(move, duration) {
   const keyframes = [
     { offset: 0, transform: start },
     t1 > 0 ? { offset: t1 / moveDuration, transform: start } : null,
-    (t2 > 0 && t2 < duration) ? { offset: t2 / moveDuration, transform: end } : null,
+    t2 > 0 && t2 < duration ? { offset: t2 / moveDuration, transform: end } : null,
     { offset: 1, transform: end },
   ].filter(Boolean);
   const options = { duration: moveDuration, fill: 'forwards' };
@@ -86,8 +89,14 @@ export function createFadeList(fade, duration) {
     // so the result is:
     // * opacity from 0 to 1 in (0, 4000)
     // * opacity from 0.25 to 0 in (4000, 5000)
-    const t1Keyframes = [{ offset: 0, opacity: 0 }, { offset: 1, opacity: 1 }];
-    const t2Keyframes = [{ offset: 0, opacity: 1 }, { offset: 1, opacity: 0 }];
+    const t1Keyframes = [
+      { offset: 0, opacity: 0 },
+      { offset: 1, opacity: 1 },
+    ];
+    const t2Keyframes = [
+      { offset: 0, opacity: 1 },
+      { offset: 1, opacity: 0 },
+    ];
     return [
       [t2Keyframes, { duration: t2, delay: duration - t2, fill: 'forwards' }],
       [t1Keyframes, { duration: t1, composite: 'replace' }],
@@ -98,9 +107,7 @@ export function createFadeList(fade, duration) {
   const opacities = [a1, a2, a3].map((a) => 1 - a / 255);
   const offsets = [0, t1, t2, t3, t4].map((t) => t / fadeDuration);
   const keyframes = offsets.map((t, i) => ({ offset: t, opacity: opacities[i >> 1] }));
-  return [
-    [keyframes, { duration: fadeDuration, fill: 'forwards' }],
-  ];
+  return [[keyframes, { duration: fadeDuration, fill: 'forwards' }]];
 }
 
 export function createAnimatableVars(tag) {
@@ -118,9 +125,8 @@ export function createAnimatableVars(tag) {
 function getEasing(duration, accel) {
   if (accel === 1) return 'linear';
   // 60fps
-  const frames = Math.ceil(duration / 1000 * 60);
-  const points = Array.from({ length: frames + 1 })
-    .map((_, i) => (i / frames) ** accel);
+  const frames = Math.ceil((duration / 1000) * 60);
+  const points = Array.from({ length: frames + 1 }).map((_, i) => (i / frames) ** accel);
   return `linear(${points.join(',')})`;
 }
 

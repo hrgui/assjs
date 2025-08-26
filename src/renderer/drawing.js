@@ -30,17 +30,16 @@ export function createDrawing(fragment, styleTag, store) {
   ]);
   $symbol.append(createSVGEl('path', [['d', fragment.drawing.d]]));
   $svg.append($symbol);
-  $svg.append(createSVGEl('use', [
-    ['width', width * scaleX],
-    ['height', height * scaleY],
-    ['xlink:href', `#${symbolId}`],
-    ['filter', `url(#${filter.id})`],
-  ]));
-  $svg.style.cssText = (
-    'position:absolute;'
-    + `left:${minX * scaleX - vbx}px;`
-    + `top:${minY * scaleY - vby}px;`
+  $svg.append(
+    createSVGEl('use', [
+      ['width', width * scaleX],
+      ['height', height * scaleY],
+      ['xlink:href', `#${symbolId}`],
+      ['filter', `url(#${filter.id})`],
+    ]),
   );
+  $svg.style.cssText =
+    'position:absolute;' + `left:${minX * scaleX - vbx}px;` + `top:${minY * scaleY - vby}px;`;
   return {
     $svg,
     cssText: `position:relative;width:${width * scaleX}px;height:${height * scaleY}px;`,

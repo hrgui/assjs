@@ -13,20 +13,20 @@ export function setEffect(dialogue, store) {
     $area.style.justifyContent = ['flex-end', 'center', 'flex-start'][dialogue.align.v];
   }
   if (name.startsWith('scroll')) {
-    const top = min / height * 100;
-    const bottom = (height - max) / height * 100;
+    const top = (min / height) * 100;
+    const bottom = ((height - max) / height) * 100;
     $area.style.cssText = `top:${top}%;bottom:${bottom}%;`;
     $area.style.justifyContent = ['flex-start', 'center', 'flex-end'][dialogue.align.h];
   }
   if (fadeAwayHeight) {
-    const p = fadeAwayHeight / (max - min) * 100;
+    const p = (fadeAwayHeight / (max - min)) * 100;
     $area.style.maskImage = [
       `linear-gradient(#000 ${100 - p}%, transparent)`,
       `linear-gradient(transparent, #000 ${p}%)`,
     ].join(',');
   }
   if (fadeAwayWidth) {
-    const p = fadeAwayWidth / width * 100;
+    const p = (fadeAwayWidth / width) * 100;
     // only left side has fade away effect in VSFilter
     $area.style.maskImage = `linear-gradient(90deg, transparent, #000 ${p}%)`;
   }

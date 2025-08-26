@@ -4,8 +4,8 @@ export const skewTags = ['fax', 'fay'];
 
 export function createTransform(tag) {
   return [
-    ...[...rotateTags, ...skewTags].map((x) => ([`--ass-tag-${x}`, `${tag[x] || 0}`])),
-    ...scaleTags.map((x) => ([`--ass-tag-${x}`, tag.p ? 1 : (tag[x] || 100) / 100])),
+    ...[...rotateTags, ...skewTags].map((x) => [`--ass-tag-${x}`, `${tag[x] || 0}`]),
+    ...scaleTags.map((x) => [`--ass-tag-${x}`, tag.p ? 1 : (tag[x] || 100) / 100]),
   ];
 }
 

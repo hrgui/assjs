@@ -29,5 +29,5 @@ export function getRealFontSize(fn, fs) {
       lineSpacing[fn] = $span.clientHeight;
     }
   }
-  return fs * unitsPerEm / lineSpacing[fn];
+  return (fs * unitsPerEm) / lineSpacing[fn];
 }

@@ -22,35 +22,35 @@
     /* for \bord0\blur4 */
     /* when x > 0, round(up, sin(x) * sin(x)) === sign(x) */
     /* sign() requires higher browser version */
-    filter: blur(calc(
-      var(--ass-scale-stroke)
-      * var(--ass-tag-blur)
-      * (1 - round(up, sin(var(--ass-tag-xbord)) * sin(var(--ass-tag-xbord))))
-      * (1 - round(up, sin(var(--ass-tag-ybord)) * sin(var(--ass-tag-ybord))))
-      * 1px
-    ));
+    filter: blur(
+      calc(
+        var(--ass-scale-stroke) * var(--ass-tag-blur) *
+          (1 - round(up, sin(var(--ass-tag-xbord)) * sin(var(--ass-tag-xbord)))) *
+          (1 - round(up, sin(var(--ass-tag-ybord)) * sin(var(--ass-tag-ybord)))) * 1px
+      )
+    );
   }
-  [data-is="br"] + [data-is="br"] {
+  [data-is='br'] + [data-is='br'] {
     height: calc(var(--ass-scale) * var(--ass-tag-fs) * 1px / 2);
   }
 }
 
-.ASS-dialogue[data-wrap-style="0"],
-.ASS-dialogue[data-wrap-style="3"] {
+.ASS-dialogue[data-wrap-style='0'],
+.ASS-dialogue[data-wrap-style='3'] {
   /* \q3 is just treated the same as \q0 in libass */
   text-wrap: balance;
   white-space: pre-wrap;
 }
-.ASS-dialogue[data-wrap-style="1"] {
+.ASS-dialogue[data-wrap-style='1'] {
   word-break: break-word;
   white-space: pre-wrap;
 }
-.ASS-dialogue[data-wrap-style="2"] {
+.ASS-dialogue[data-wrap-style='2'] {
   word-break: normal;
   white-space: pre;
 }
 
-.ASS-dialogue [data-border-style="1"] {
+.ASS-dialogue [data-border-style='1'] {
   position: relative;
   &::before,
   &::after {
@@ -63,15 +63,19 @@
   }
   &::before {
     color: var(--ass-shadow-color);
-    -webkit-text-stroke: calc(var(--ass-scale-stroke) * var(--ass-border-width) * 1px) var(--ass-shadow-color);
-    transform: translate(calc(var(--ass-scale-stroke) * var(--ass-tag-xshad) * 1px),
-        calc(var(--ass-scale-stroke) * var(--ass-tag-yshad) * 1px));
+    -webkit-text-stroke: calc(var(--ass-scale-stroke) * var(--ass-border-width) * 1px)
+      var(--ass-shadow-color);
+    transform: translate(
+      calc(var(--ass-scale-stroke) * var(--ass-tag-xshad) * 1px),
+      calc(var(--ass-scale-stroke) * var(--ass-tag-yshad) * 1px)
+    );
   }
   &::after {
     color: var(--ass-border-color);
-    -webkit-text-stroke: calc(var(--ass-scale-stroke) * var(--ass-border-width) * 1px) var(--ass-border-color);
+    -webkit-text-stroke: calc(var(--ass-scale-stroke) * var(--ass-border-width) * 1px)
+      var(--ass-border-color);
   }
-  &[data-stroke="svg"] {
+  &[data-stroke='svg'] {
     color: #000;
     &::before,
     &::after {
@@ -80,25 +84,24 @@
   }
 }
 @container style(--ass-tag-xbord: 0) and style(--ass-tag-ybord: 0) {
-  .ASS-dialogue [data-border-style="1"]::after {
+  .ASS-dialogue [data-border-style='1']::after {
     display: none;
   }
 }
 @container style(--ass-tag-xshad: 0) and style(--ass-tag-yshad: 0) {
-  .ASS-dialogue [data-border-style="1"]::before {
+  .ASS-dialogue [data-border-style='1']::before {
     display: none;
   }
 }
 
-.ASS-dialogue [data-border-style="3"] {
-  padding:
-    calc(var(--ass-scale-stroke) * var(--ass-tag-xbord) * 1px)
+.ASS-dialogue [data-border-style='3'] {
+  padding: calc(var(--ass-scale-stroke) * var(--ass-tag-xbord) * 1px)
     calc(var(--ass-scale-stroke) * var(--ass-tag-ybord) * 1px);
   position: relative;
   filter: blur(calc(var(--ass-scale-stroke) * var(--ass-tag-blur) * 1px));
   &::before,
   &::after {
-    content: "";
+    content: '';
     width: 100%;
     height: 100%;
     position: absolute;
@@ -116,12 +119,12 @@
   }
 }
 @container style(--ass-tag-xbord: 0) and style(--ass-tag-ybord: 0) {
-  .ASS-dialogue [data-border-style="3"]::after {
+  .ASS-dialogue [data-border-style='3']::after {
     background-color: transparent;
   }
 }
 @container style(--ass-tag-xshad: 0) and style(--ass-tag-yshad: 0) {
-  .ASS-dialogue [data-border-style="3"]::before {
+  .ASS-dialogue [data-border-style='3']::before {
     background-color: transparent;
   }
 }
@@ -130,10 +133,8 @@
   /* TODO: {\an5\fs80\bord0\shad60\frx30\frz30\fry30}1234567890 */
   /* TODO: {\frz-90\shad30} */
   /* https://github.com/libass/libass/issues/805 */
-  transform: perspective(312.5px)
-    rotateY(calc(var(--ass-tag-fry) * 1deg))
-    rotateX(calc(var(--ass-tag-frx) * 1deg))
-    rotateZ(calc(var(--ass-tag-frz) * -1deg));
+  transform: perspective(312.5px) rotateY(calc(var(--ass-tag-fry) * 1deg))
+    rotateX(calc(var(--ass-tag-frx) * 1deg)) rotateZ(calc(var(--ass-tag-frz) * -1deg));
   &[data-text] {
     transform-style: preserve-3d;
     word-break: normal;
@@ -174,7 +175,7 @@
   height: fit-content;
   overflow: hidden;
   mask-composite: intersect;
-  &[data-effect="banner"] {
+  &[data-effect='banner'] {
     flex-direction: column;
     height: 100%;
   }
