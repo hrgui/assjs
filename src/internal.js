@@ -22,10 +22,7 @@ function framing(store, mediaTime) {
       actives.splice(i, 1);
     }
   }
-  while (
-    store.index < dialogues.length
-    && vct >= dialogues[store.index].start
-  ) {
+  while (store.index < dialogues.length && vct >= dialogues[store.index].start) {
     if (vct < dialogues[store.index].end) {
       const dia = renderer(dialogues[store.index], store);
       (dia.animations || []).forEach((animation) => {
@@ -44,7 +41,12 @@ export function createSeek(store) {
   return function seek() {
     clear(store);
     const { video, dialogues } = store;
-    const vct = video.currentTime - store.delay;
+
+    if (video) {
+      store.currentTime = video.currentTime;
+    }
+
+    const vct = store.currentTime - (store.delay || 0);
     store.index = (() => {
       for (let i = 0; i < dialogues.length; i += 1) {
         if (vct < dialogues[i].end) {
@@ -53,12 +55,12 @@ export function createSeek(store) {
       }
       return (dialogues.length || 1) - 1;
     })();
-    framing(store, video.currentTime);
+    framing(store, store.currentTime);
   };
 }
 
 function createFrame(video) {
-  const useVFC = video.requestVideoFrameCallback;
+  const useVFC = video && video.requestVideoFrameCallback;
   return [
     useVFC ? video.requestVideoFrameCallback.bind(video) : requestAnimationFrame,
     useVFC ? video.cancelVideoFrameCallback.bind(video) : cancelAnimationFrame,
@@ -70,6 +72,10 @@ export function createPlay(store) {
   const [requestFrame, cancelFrame] = createFrame(video);
   return function play() {
     const frame = (now, metadata) => {
+      if (video) {
+        store.currentTime = video.currentTime;
+      }
+
       framing(store, metadata?.mediaTime || video.currentTime);
       store.requestId = requestFrame(frame);
     };
@@ -93,8 +99,26 @@ export function createPause(store) {
 }
 
 export function createResize(that, store) {
-  const { video, box, layoutRes } = store;
+  const { video, container, box, layoutRes } = store;
   return function resize() {
+    if (!video && !container) {
+      return;
+    }
+
+    if (!video) {
+      const cw = container.clientWidth;
+      const ch = container.clientHeight;
+
+      if (cw && ch) {
+        container.width = cw;
+        container.height = ch;
+
+        store.width = cw;
+        store.height = ch;
+        store.resampledRes = { width: cw, height: ch };
+      }
+    }
+
     const cw = video.clientWidth;
     const ch = video.clientHeight;
     const vw = video.videoWidth || cw;
@@ -107,10 +131,10 @@ export function createResize(that, store) {
     let rh = sh;
     const videoScale = Math.min(cw / lw, ch / lh);
     if (that.resampling === 'video_width') {
-      rh = sw / lw * lh;
+      rh = (sw / lw) * lh;
     }
     if (that.resampling === 'video_height') {
-      rw = sh / lh * lw;
+      rw = (sh / lh) * lw;
     }
     store.scale = Math.min(cw / rw, ch / rh);
     if (that.resampling === 'script_width') {
@@ -128,7 +152,7 @@ export function createResize(that, store) {
     box.style.cssText = `width:${bw}px;height:${bh}px;top:${(ch - bh) / 2}px;left:${(cw - bw) / 2}px;`;
     box.style.setProperty('--ass-scale', store.scale);
     box.style.setProperty('--ass-scale-stroke', store.sbas ? store.scale : 1);
-    const boxScale = (vw / lw) / (vh / lh);
+    const boxScale = vw / lw / (vh / lh);
     if (boxScale > 1) {
       box.style.transform = `scaleX(${boxScale})`;
     }

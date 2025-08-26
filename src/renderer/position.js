@@ -1,10 +1,10 @@
 function allocate(dialogue, store) {
-  const { video, space, scale } = store;
+  const { space, scale } = store;
   const { layer, margin, width, height, alignment, end } = dialogue;
   const stageWidth = store.width - Math.trunc(scale * (margin.left + margin.right));
   const stageHeight = store.height;
   const vertical = Math.trunc(scale * margin.vertical);
-  const vct = video.currentTime * 100;
+  const vct = store.currentTime * 100;
   space[layer] = space[layer] || {
     left: { width: new Uint16Array(stageHeight + 1), end: new Uint32Array(stageHeight + 1) },
     center: { width: new Uint16Array(stageHeight + 1), end: new Uint32Array(stageHeight + 1) },
@@ -20,21 +20,18 @@ function allocate(dialogue, store) {
     const ce = channel.center.end[y];
     const re = channel.right.end[y];
     return (
-      (alignH === 'left' && (
-        (le > vct && lw)
-        || (ce > vct && cw && 2 * width + cw > stageWidth)
-        || (re > vct && rw && width + rw > stageWidth)
-      ))
-      || (alignH === 'center' && (
-        (le > vct && lw && 2 * lw + width > stageWidth)
-        || (ce > vct && cw)
-        || (re > vct && rw && 2 * rw + width > stageWidth)
-      ))
-      || (alignH === 'right' && (
-        (le > vct && lw && lw + width > stageWidth)
-        || (ce > vct && cw && 2 * width + cw > stageWidth)
-        || (re > vct && rw)
-      ))
+      (alignH === 'left' &&
+        ((le > vct && lw) ||
+          (ce > vct && cw && 2 * width + cw > stageWidth) ||
+          (re > vct && rw && width + rw > stageWidth))) ||
+      (alignH === 'center' &&
+        ((le > vct && lw && 2 * lw + width > stageWidth) ||
+          (ce > vct && cw) ||
+          (re > vct && rw && 2 * rw + width > stageWidth))) ||
+      (alignH === 'right' &&
+        ((le > vct && lw && lw + width > stageWidth) ||
+          (ce > vct && cw && 2 * width + cw > stageWidth) ||
+          (re > vct && rw)))
     );
   };
   let count = 0;
@@ -85,20 +82,12 @@ export function getPosition(dialogue, store) {
     x = [sx, sx - width / 2, sx - width][align.h];
     y = [sy - height, sy - height / 2, sy][align.v];
   } else {
-    x = [
-      0,
-      (store.width - width) / 2,
-      store.width - width - scale * margin.right,
-    ][align.h];
-    const hasT = slices.some((slice) => (
-      slice.fragments.some(({ keyframes }) => keyframes?.length)
-    ));
+    x = [0, (store.width - width) / 2, store.width - width - scale * margin.right][align.h];
+    const hasT = slices.some((slice) => slice.fragments.some(({ keyframes }) => keyframes?.length));
     y = hasT
-      ? [
-        store.height - height - margin.vertical,
-        (store.height - height) / 2,
-        margin.vertical,
-      ][align.v]
+      ? [store.height - height - margin.vertical, (store.height - height) / 2, margin.vertical][
+          align.v
+        ]
       : allocate(dialogue, store);
   }
   return {

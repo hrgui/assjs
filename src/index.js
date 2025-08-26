@@ -55,6 +55,7 @@ export default class ASS {
     /** record dialogues' position */
     space: [],
     requestId: 0,
+    currentTime: 0,
     delay: 0,
   };
 
@@ -163,6 +164,11 @@ export default class ASS {
     this.#store.observer = observer;
 
     return this;
+  }
+
+  setCurrentTime(t) {
+    this.#store.currentTime = t;
+    this.#seek();
   }
 
   /**
