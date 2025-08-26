@@ -5,21 +5,19 @@
   "parserOptions": {
     "ecmaVersion": "latest"
   },
-  "extends": [
-    "airbnb-base",
-    "plugin:unicorn/recommended"
-  ],
-  "plugins": [
-    "unicorn"
-  ],
+  "extends": ["airbnb-base", "plugin:unicorn/recommended"],
+  "plugins": ["unicorn"],
   "rules": {
     "no-bitwise": 0,
     "no-constructor-return": 0,
     "no-mixed-operators": 0,
-    "object-curly-newline": ["error", {
-      "ObjectExpression": { "multiline": true, "consistent": true },
-      "ObjectPattern": { "multiline": true, "consistent": true }
-    }],
+    "object-curly-newline": [
+      "error",
+      {
+        "ObjectExpression": { "multiline": true, "consistent": true },
+        "ObjectPattern": { "multiline": true, "consistent": true }
+      }
+    ],
     "import/extensions": ["error", "ignorePackages"],
     "import/no-extraneous-dependencies": 0,
     "import/prefer-default-export": 0,
@@ -33,6 +31,7 @@
     "unicorn/prefer-spread": 0,
     "unicorn/prefer-string-raw": 0,
     "unicorn/prefer-string-replace-all": 0,
-    "unicorn/prevent-abbreviations": 0
+    "unicorn/prevent-abbreviations": 0,
+    "implicit-arrow-linebreak": 0
   }
 }
