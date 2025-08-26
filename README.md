@@ -1,7 +1,7 @@
 # @hrgui/assjs
 
 > [!NOTE]
-> This is a modified version of [https://github.com/weizhenye/ASS] that attempts to try to make it work for older browsers!
+> This is a modified version of https://github.com/weizhenye/ASS that attempts to try to make it work for older browsers!
 
 # Planned Changes
 
@@ -12,4 +12,4 @@
 - [ ] Make it be able to distinguish between subtitles and signs
 
 > [!WARNING]
-> Under construction - API still not complete - but feel free to look at [./ORIGINAL-README.md](ORIGINAL README)
+> Under construction - API still not complete - but feel free to look at [ORIGINAL README](./ORIGINAL-README.md)
