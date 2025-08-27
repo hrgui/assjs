@@ -1,6 +1,7 @@
 import type { CompiledASSStyle, Dialogue } from 'ass-compiler';
 export interface ASSStore {
   video: HTMLVideoElement | null;
+  container: HTMLElement | null;
   box: HTMLDivElement;
   observer: ResizeObserver | null;
   scale: number;

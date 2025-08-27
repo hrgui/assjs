@@ -1,5 +1,4 @@
-import GLOBAL_CSS from './global.css';
-
+import GLOBAL_CSS from './global.css?raw';
 export function alpha2opacity(a: string): number {
   return 1 - parseInt(a, 16) / 255;
 }

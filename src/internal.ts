@@ -29,7 +29,7 @@ function framing(store: any, mediaTime: number): void {
         animation.currentTime = (vct - dia.start) * 1000;
       });
       actives.push(dia);
-      if (!store.video.paused) {
+      if (!store.video?.paused) {
         batchAnimate(dia, 'play');
       }
     }
@@ -105,24 +105,10 @@ export function createResize(that: any, store: any): () => void {
       return;
     }
 
-    if (!video) {
-      const cw = container.clientWidth;
-      const ch = container.clientHeight;
-
-      if (cw && ch) {
-        container.width = cw;
-        container.height = ch;
-
-        store.width = cw;
-        store.height = ch;
-        store.resampledRes = { width: cw, height: ch };
-      }
-    }
-
-    const cw = video.clientWidth;
-    const ch = video.clientHeight;
-    const vw = video.videoWidth || cw;
-    const vh = video.videoHeight || ch;
+    const cw = video?.clientWidth || container.clientWidth;
+    const ch = video?.clientHeight || container.clientHeight;
+    const vw = video?.videoWidth || cw;
+    const vh = video?.videoHeight || ch;
     const lw = layoutRes.width || vw;
     const lh = layoutRes.height || vh;
     const sw = store.scriptRes.width;

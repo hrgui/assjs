@@ -24,6 +24,7 @@ export default class ASS {
   #store: ASSStore = {
     /** @type {HTMLVideoElement} */
     video: null,
+    container: null,
     /** the box to display subtitles */
     box: document.createElement('div'),
     /**
@@ -98,12 +99,12 @@ export default class ASS {
    * ```
    */
   constructor({
-    content,
+    subContent: content,
     container,
     video,
     resampling,
   }: {
-    content: string;
+    subContent: string;
     container: HTMLElement;
     video?: HTMLVideoElement;
     resampling?: string;
@@ -111,6 +112,7 @@ export default class ASS {
     if (!container) {
       throw new Error('Missing container.');
     }
+    this.#store.container = container;
     this.#store.video = video || null;
 
     const { info, width, height, styles, dialogues } = compile(content, {});
