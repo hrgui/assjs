@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { compile } from 'ass-compiler';
+import { compile, CompiledASS } from 'ass-compiler';
 import { $fixFontSize } from './renderer/font-size.js';
 import { clear, createResize, createPlay, createPause, createSeek } from './internal.js';
 import { addGlobalStyle } from './utils.js';
@@ -99,12 +99,14 @@ export default class ASS {
    * ```
    */
   constructor({
-    subContent: content,
+    subContent,
+    compiledSubContent: compiledSubContent,
     container,
     video,
     resampling,
   }: {
-    subContent: string;
+    subContent?: string;
+    compiledSubContent?: CompiledASS;
     container: HTMLElement;
     video?: HTMLVideoElement;
     resampling?: string;
@@ -115,7 +117,14 @@ export default class ASS {
     this.#store.container = container;
     this.#store.video = video || null;
 
-    const { info, width, height, styles, dialogues } = compile(content, {});
+    const compiledAss = compiledSubContent || (subContent ? compile(subContent, {}) : null);
+
+    if (!compiledAss) {
+      throw new Error('No content provided');
+    }
+
+    const { info, width, height, styles, dialogues } = compiledAss;
+
     this.#store.sbas = /yes/i.test(info.ScaledBorderAndShadow);
     // Use container dimensions as fallback if no video is provided
     const fallbackWidth = container.clientWidth || 640;
