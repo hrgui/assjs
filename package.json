@@ -3,8 +3,9 @@
   "version": "0.0.0",
   "type": "module",
   "description": "A lightweight JavaScript ASS subtitle renderer",
-  "main": "dist/ass.js",
-  "types": "dist/ass.d.ts",
+  "main": "dist/ass.umd.js",
+  "module": "dist/ass.es.js",
+  "typings": "dist/ass.d.ts",
   "files": [
     "dist",
     "src"
