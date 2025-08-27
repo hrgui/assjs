@@ -7,8 +7,7 @@
   "module": "dist/ass.es.js",
   "typings": "dist/ass.d.ts",
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "scripts": {
     "prettier": "prettier --write src/.",
