@@ -49,6 +49,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-unicorn": "^56.0.1",
+    "jassub": "^1.8.6",
     "lightningcss": "^1.29.1",
     "playwright": "^1.50.1",
     "prettier": "^3.6.2",

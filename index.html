@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ASS Subtitle Renderer</title>
+    <style>
+      body {
+        background-color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        height: 100vh;
+        margin: 0;
+      }
+      canvas {
+        background-color: transparent;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 20;
+        pointer-events: none;
+      }
+
+      .videoContainer {
+        position: relative;
+        width: 640px;
+        height: 360px;
+        aspect-ratio: 16/9;
+      }
+
+      canvas {
+        background: rgba(255, 0, 0, 0.2);
+        top: 0;
+        left: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div style="display: flex">
+      <div class="videoContainer" style="width: 640px; height: 360px; background: pink">
+        <div id="subtitleCanvas" style="width: 640px; height: 360px"></div>
+      </div>
+      <div class="videoContainer" style="background: rgba(0, 255, 0, 0.2)">
+        <canvas id="subtitleCanvas2" width="640" height="360"></canvas>
+      </div>
+    </div>
+
+    <div style="width: 100vh; display: flex">
+      <button id="playPauseButton">Play</button>
+      <input id="numberInput" type="number" step="0.1" value="0" max="68" />
+      <input id="slider" style="width: 100%" step="0.1" type="range" value="0" max="68" />
+    </div>
+    <script type="module" src="./src/sandbox/index.ts"></script>
+    <!-- Ensure this points to your JavaScript file -->
+  </body>
+</html>
