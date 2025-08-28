@@ -13,7 +13,7 @@
     "prettier": "prettier --write src/.",
     "lint": "eslint src test",
     "build": "vite build",
-    "build-demo": "DEMO=1 vite build",
+    "build-demo": "DEMO=1 vite build && cp ./node_modules/jassub/dist/default.woff2 ./dist/assets/default.woff2",
     "dev": "vite"
   },
   "repository": {
