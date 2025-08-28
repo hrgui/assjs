@@ -22,6 +22,7 @@ import { ASSStore } from './types/ASSStore.js';
 
 export default class ASS {
   #store: ASSStore = {
+    disableAnimations: false,
     /** @type {HTMLVideoElement} */
     video: null,
     container: null,
@@ -102,13 +103,15 @@ export default class ASS {
    */
   constructor({
     subContent,
-    compiledSubContent: compiledSubContent,
+    compiledSubContent,
+    disableAnimations,
     container,
     video,
     resampling,
   }: {
     subContent?: string;
     compiledSubContent?: CompiledASS;
+    disableAnimations?: boolean;
     container: HTMLElement;
     video?: HTMLVideoElement;
     resampling?: string;
@@ -118,6 +121,7 @@ export default class ASS {
     }
     this.#store.container = container;
     this.#store.video = video || null;
+    this.#store.disableAnimations = disableAnimations;
 
     const compiledAss = compiledSubContent || (subContent ? compile(subContent, {}) : null);
 

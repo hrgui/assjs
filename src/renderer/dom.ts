@@ -138,7 +138,7 @@ export function createDialogue(dialogue: ASSDialogue, store: ASSStore) {
         });
     });
   });
-  animations.push(...createDialogueAnimations($div, dialogue));
+  !store.disableAnimations && animations.push(...createDialogueAnimations($div, dialogue));
   $div.append(df);
   return { $div, animations };
 }

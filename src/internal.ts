@@ -30,7 +30,7 @@ function framing(store: any, mediaTime: number): void {
       });
       actives.push(dia);
       if (!store.video?.paused) {
-        batchAnimate(dia, 'play');
+        !store.disableAnimations && batchAnimate(dia, 'play');
       }
     }
     store.index += 1;
@@ -82,7 +82,7 @@ export function createPlay(store: any): () => void {
     cancelFrame(store.requestId);
     store.requestId = requestFrame(frame);
     store.actives.forEach((dia: any) => {
-      batchAnimate(dia, 'play');
+      !store.disableAnimations && batchAnimate(dia, 'play');
     });
   };
 }
@@ -93,7 +93,7 @@ export function createPause(store: any): () => void {
     cancelFrame(store.requestId);
     store.requestId = 0;
     store.actives.forEach((dia: any) => {
-      batchAnimate(dia, 'pause');
+      !store.disableAnimations && batchAnimate(dia, 'pause');
     });
   };
 }

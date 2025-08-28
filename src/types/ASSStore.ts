@@ -1,5 +1,6 @@
 import type { CompiledASSStyle, Dialogue } from 'ass-compiler';
 export interface ASSStore {
+  disableAnimations?: boolean;
   video: HTMLVideoElement | null;
   container: HTMLElement | null;
   box: HTMLDivElement;

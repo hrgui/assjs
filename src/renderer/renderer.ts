@@ -22,7 +22,9 @@ export function renderer(dialogue: ASSDialogue, store: ASSStore) {
   $div.style.cssText += `left:${x}px;top:${y}px;`;
   setTransformOrigin(dialogue, store.scale);
   // TODO: refactor to create .clip-area or .effect-area wrappers in `createDialogue`
-  Object.assign(dialogue, getClipPath(dialogue, store));
+  if (!store.disableAnimations) {
+    Object.assign(dialogue, getClipPath(dialogue, store));
+  }
   if (dialogue.effect) {
     Object.assign(dialogue, { $div: setEffect(dialogue, store) });
   }

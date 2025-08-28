@@ -24,6 +24,7 @@ export function comparisonTool({
   const kanassRenderer = new ASS({
     subContent: subContent,
     container: document.getElementById('subtitleCanvas') as HTMLCanvasElement,
+    disableAnimations: true,
   });
 
   const jassubRenderer = new JASSUB({
