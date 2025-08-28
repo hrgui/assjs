@@ -76,7 +76,7 @@ export function createPlay(store: any): () => void {
         store.currentTime = video.currentTime;
       }
 
-      framing(store, metadata?.mediaTime || video.currentTime);
+      framing(store, metadata?.mediaTime || video?.currentTime || store.currentTime);
       store.requestId = requestFrame(frame);
     };
     cancelFrame(store.requestId);

@@ -68,6 +68,8 @@ export default class ASS {
 
   #resize;
 
+  private lastSeekTime = 0;
+
   /**
    * Initialize an ASS instance
    * @param {Object} params
@@ -191,7 +193,14 @@ export default class ASS {
 
   setCurrentTime(t: number): void {
     this.#store.currentTime = t;
-    this.#seek();
+    const diff = t - this.lastSeekTime;
+    this.lastSeekTime = t;
+
+    if (diff < 2 && diff >= 0) {
+      this.#play();
+    } else {
+      this.#seek();
+    }
   }
 
   /**
