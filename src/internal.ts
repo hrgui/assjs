@@ -71,13 +71,20 @@ export function createPlay(store: any): () => void {
   const { video } = store;
   const [requestFrame, cancelFrame] = createFrame(video);
   return function play(): void {
+    let lastCurrentTime = -1;
     const frame = (now: any, metadata: any) => {
       if (video) {
         store.currentTime = video.currentTime;
       }
+      const currentTime = metadata?.mediaTime || video?.currentTime || store.currentTime;
 
-      framing(store, metadata?.mediaTime || video?.currentTime || store.currentTime);
-      store.requestId = requestFrame(frame);
+      framing(store, currentTime);
+      if (lastCurrentTime !== currentTime) {
+        store.requestId = requestFrame(frame);
+      } else {
+        store.requestId = cancelFrame(frame);
+      }
+      lastCurrentTime = currentTime;
     };
     cancelFrame(store.requestId);
     store.requestId = requestFrame(frame);
