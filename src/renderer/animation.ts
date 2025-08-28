@@ -82,26 +82,24 @@ export function createMove(move: any, duration: number) {
 
 export function createFadeList(fade: any, duration: number) {
   const { type, a1, a2, a3, t1, t2, t3, t4 } = fade;
+
   // \fad(<t1>, <t2>)
   if (type === 'fad') {
-    // For example dialogue starts at 0 and ends at 5000 with \fad(4000, 4000)
-    // * <t1> means opacity from 0 to 1 in (0, 4000)
-    // * <t2> means opacity from 1 to 0 in (1000, 5000)
-    // <t1> and <t2> are overlaped in (1000, 4000), <t1> will take affect
-    // so the result is:
-    // * opacity from 0 to 1 in (0, 4000)
-    // * opacity from 0.25 to 0 in (4000, 5000)
-    const t1Keyframes = [
-      { offset: 0, opacity: 0 },
-      { offset: 1, opacity: 1 },
-    ];
-    const t2Keyframes = [
-      { offset: 0, opacity: 1 },
-      { offset: 1, opacity: 0 },
-    ];
     return [
-      [t2Keyframes, { duration: t2, delay: duration - t2, fill: 'forwards' }],
-      [t1Keyframes, { duration: t1, composite: 'replace' }],
+      [
+        [
+          { offset: 0, opacity: 0 }, // before fade-in
+          { offset: t1 / duration, opacity: 1 }, // after fade-in
+          { offset: (duration - t2) / duration, opacity: 1 }, // hold visible
+          { offset: 1, opacity: 0 }, // fade-out
+        ],
+        {
+          duration,
+          fill: 'forwards',
+          composite: 'replace',
+          iterations: 1,
+        },
+      ],
     ];
   }
   // \fade(<a1>, <a2>, <a3>, <t1>, <t2>, <t3>, <t4>)
