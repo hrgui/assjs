@@ -1,8 +1,9 @@
 import { defineConfig } from 'vite';
+import legacy from '@vitejs/plugin-legacy';
 import dts from 'unplugin-dts/vite';
 
 export default defineConfig(({ mode, command }) => {
-  if (command === 'build') {
+  if (!process.env.DEMO && command === 'build') {
     return {
       plugins: [
         dts({
@@ -20,5 +21,12 @@ export default defineConfig(({ mode, command }) => {
     };
   }
 
-  return {};
+  return {
+    base: './',
+    plugins: [
+      legacy({
+        targets: ['defaults', 'chrome >= 63'],
+      }),
+    ],
+  };
 });
